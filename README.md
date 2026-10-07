@@ -1,6 +1,4 @@
-==================================================
    NUMBER BUILDER: NINJA BRICK ACADEMY
-==================================================
 
 A free maths game for kids aged about 6 to 7.
 
@@ -163,6 +161,4 @@ FOR GROWN-UPS: WHAT IT RUNS ON
     are original drawings.
 
 
-==================================================
    Have fun, ninja! Build big, count smart!
-==================================================
