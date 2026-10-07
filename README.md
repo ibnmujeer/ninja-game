@@ -8,7 +8,7 @@ Rumble, a grumpy robot!
 
 PLAY IT HERE:
 
-    https://YOURNAME.github.io/ninja-game/
+    https://ibnmujeer.github.io/ninja-game/
 
 (Open that address on a computer, a tablet or a
 phone. Nothing to install.)
