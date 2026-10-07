@@ -1,0 +1,397 @@
+/* ==========================================================================
+   Number Builder: Ninja Brick Academy. One offline file: no fonts, images,
+   libraries or network. All UI sizes use rem; applyScale() in the script sets
+   the root font-size (never below 16px), so phones keep the minimum sizes and
+   tablets scale up. Brick pictures use --u (stud pitch in px) from fitStage().
+   ========================================================================== */
+
+/* ---------- Base ---------- */
+:root {
+  --red: #e3000b; --blue: #0057c8; --yellow: #ffd500; --green: #00a03c; --orange: #ff7e14;
+  --black: #1d1d1d; --white: #ffffff; --grey: #a4a8ad; --gold: #f2b705; --skin: #ffd23f; --sky: #dff3ff;
+  --ink: #111111;
+  --line: 3px; /* thick black outline on bricks, buttons and cards */
+  --font: "Comic Sans MS", "Comic Sans", "Chalkboard SE", "Chalkboard", "Comic Neue", "Coming Soon", casual, "Segoe UI", system-ui, sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body {
+  height: 100%; margin: 0; overflow: hidden;
+  touch-action: manipulation;
+  -webkit-user-select: none; user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%; text-size-adjust: 100%;
+}
+html { font-size: 16px; }
+/* Studded yellow baseplate: a light stud highlight over a darker offset rim. */
+body {
+  font-family: var(--font);
+  color: var(--ink);
+  background-color: var(--yellow);
+  background-image:
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,.42) 0, rgba(255,255,255,.42) .42rem, transparent .47rem),
+    radial-gradient(circle at calc(50% + 2px) calc(50% + 2px), rgba(0,0,0,.11) 0, rgba(0,0,0,.11) .46rem, transparent .51rem);
+  background-size: 2rem 2rem;
+}
+h1, h2, h3, p { margin: 0; }
+
+/* ---------- Frame: one scrolling app box, one screen at a time ---------- */
+#app {
+  position: relative;
+  height: 100vh; height: 100dvh;
+  overflow-x: hidden; overflow-y: auto;
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+}
+.screen {
+  position: relative;
+  max-width: 48rem; min-height: 100%; margin: 0 auto;
+  display: flex; flex-direction: column; gap: .375rem;
+  padding: .375rem .5rem;
+}
+.screen.enter { animation: enter .2s ease-out; }
+
+/* ---------- Buttons: chunky bricks with a black outline and a press-down shadow ---------- */
+button {
+  font: inherit; font-weight: bold; color: inherit;
+  min-width: 3.6rem; min-height: 3.6rem;
+  margin: 0; padding: .25rem .75rem;
+  border: var(--line) solid var(--ink); border-radius: .6rem;
+  background: var(--white);
+  box-shadow: 0 .3rem 0 var(--ink);
+  cursor: pointer; touch-action: manipulation;
+  position: relative;
+  -webkit-appearance: none; appearance: none;
+}
+[data-action] { min-width: 3.6rem; min-height: 3.6rem; }
+button:active:not(:disabled) { transform: translateY(.2rem); box-shadow: 0 .1rem 0 var(--ink); }
+button:disabled { cursor: default; }
+button:focus { outline: none; }
+button:focus-visible { outline: 4px solid var(--blue); outline-offset: 2px; }
+button svg { display: block; pointer-events: none; }
+.icon-btn { width: 3.6rem; height: 3.6rem; padding: 0; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+.icon-btn svg { width: 2.3rem; height: 2.3rem; }
+.face { display: block; flex: none; }
+.face svg { display: block; width: 100%; height: 100%; }
+/* ---------- Shared pieces ---------- */
+.big-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  min-height: 4.2rem; padding: .4rem 1.4rem;
+  font-size: 1.6rem; line-height: 1.1;
+}
+.big-btn svg { width: 2rem; height: 2rem; flex: none; }
+.btn-green { background: var(--green); color: #fff; text-shadow: 0 2px 0 rgba(0,0,0,.45); }
+.btn-yellow { background: var(--yellow); }
+.btn-white { background: var(--white); }
+.bar { display: flex; align-items: center; gap: .375rem; min-height: 3.9rem; }
+.screen-title { flex: 1; min-width: 0; font-size: 1.6rem; line-height: 1.1; text-align: center; }
+.card { background: var(--white); border: var(--line) solid var(--ink); border-radius: .9rem; box-shadow: 0 .35rem 0 var(--ink); }
+/* Outlined white text for coloured tiles and banners. */
+.outlined { color: #fff; text-shadow: 0 2px 0 var(--ink), 0 -1px 0 var(--ink), 1px 0 0 var(--ink), -1px 0 0 var(--ink), 2px 2px 0 var(--ink), -2px 2px 0 var(--ink); }
+/* A row of studs on top of a brick-style tile or banner (colour from --tc). */
+.studs { position: absolute; left: .7rem; right: .7rem; bottom: 100%; display: flex; justify-content: space-between; pointer-events: none; }
+.studs i { display: block; width: 1.15rem; height: calc(.5rem + 3px); background: var(--tc, #fff); border: var(--line) solid var(--ink); border-bottom: 0; border-radius: .3rem .3rem 0 0; }
+.tile-red { --tc: var(--red); } .tile-blue { --tc: var(--blue); } .tile-green { --tc: var(--green); }
+.tile-orange { --tc: var(--orange); } .tile-black { --tc: var(--black); } .tile-yellow { --tc: var(--yellow); }
+
+/* ---------- Title ---------- */
+.title-screen { align-items: center; justify-content: space-evenly; text-align: center; padding-top: 1rem; padding-bottom: 1rem; }
+.game-name { display: flex; flex-direction: column; align-items: center; gap: 1.2rem; margin-top: .7rem; }
+.game-name > span {
+  position: relative; display: block; max-width: 100%;
+  padding: .25rem 1rem .4rem; line-height: 1.1;
+  border: var(--line) solid var(--ink); border-radius: .5rem; box-shadow: 0 .3rem 0 var(--ink);
+  background: var(--tc); color: #fff; text-shadow: 0 3px 0 rgba(0,0,0,.5);
+}
+.name-1 { --tc: var(--red); font-size: clamp(1.6rem, 9vw, 2.4rem); }
+.name-2 { --tc: var(--blue); font-size: clamp(1.15rem, 6vw, 1.6rem); }
+.title-art { display: flex; align-items: flex-end; justify-content: center; }
+.title-hero { width: min(9rem, 28vh); height: min(9rem, 28vh); }
+.title-villain { width: min(4.6rem, 14vh); height: min(4.6rem, 14vh); margin-left: -.4rem; transform: rotate(9deg); }
+.play-btn { min-width: 12rem; min-height: 5rem; font-size: 2.2rem; }
+.play-btn svg { width: 2.4rem; height: 2.4rem; }
+
+/* ---------- Hero picker ---------- */
+.picker-screen .screen-title { padding-right: .2rem; }
+.hero-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; align-content: start; }
+@media (min-width: 600px) { .hero-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.hero-card { display: flex; flex-direction: column; align-items: center; gap: .1rem; padding: .3rem .2rem; background: var(--white); }
+.card-face { width: min(4.5rem, 11.5vh); height: min(4.5rem, 11.5vh); }
+.hero-name { font-size: 1.15rem; line-height: 1.15; }
+.hero-card.chosen { background: var(--yellow); box-shadow: 0 .3rem 0 var(--ink), 0 0 0 .25rem var(--green); }
+
+/* ---------- Home ---------- */
+.home-hero { width: 3.2rem; height: 3.2rem; margin-right: .15rem; }
+.hello { flex: 1; min-width: 0; font-size: 1.35rem; font-weight: bold; line-height: 1.1; overflow-wrap: anywhere; }
+.home-title { text-align: center; font-size: 1.7rem; line-height: 1.1; }
+.world-list { display: flex; flex-direction: column; gap: .85rem; padding-top: .6rem; }
+.world-tile {
+  display: flex; align-items: center; gap: .55rem; width: 100%; min-height: 4.3rem;
+  padding: .3rem .55rem; text-align: left; background: var(--tc); color: #fff;
+}
+.tile-symbol {
+  flex: none; display: flex; align-items: center; justify-content: center;
+  width: 2.8rem; height: 2.8rem; font-size: 2.5rem; line-height: 1;
+  background: var(--white); color: var(--ink); border: var(--line) solid var(--ink); border-radius: .5rem;
+}
+.tile-black .tile-symbol { background: var(--gold); }
+.tile-black { box-shadow: 0 .3rem 0 var(--ink), inset 0 0 0 3px var(--gold); }
+.tile-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.tile-name { font-size: clamp(1.1rem, 5.6vw, 1.3rem); line-height: 1.1; }
+.tile-op { font-size: clamp(.82rem, 4.1vw, .95rem); font-weight: normal; line-height: 1.2; }
+.stars-count {
+  flex: none; display: flex; align-items: center; gap: .1rem;
+  padding: .1rem .45rem .1rem .2rem; font-size: 1.25rem;
+  background: var(--white); color: var(--ink); border: var(--line) solid var(--ink); border-radius: 1rem; text-shadow: none;
+}
+.stars-count svg { width: 1.5rem; height: 1.5rem; }
+.badge {
+  position: absolute; top: -.75rem; right: .5rem; padding: 0 .4rem; font-size: .95rem;
+  background: var(--yellow); color: var(--ink); border: var(--line) solid var(--ink); border-radius: .5rem;
+  text-shadow: none; transform: rotate(4deg);
+}
+.world-tile.suggested { animation: glow 1.6s ease-in-out infinite; }
+
+/* ---------- Story card ---------- */
+.story-card {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: space-evenly;
+  gap: .6rem; margin-top: .2rem; margin-bottom: .4rem; padding: 1.1rem .8rem .9rem; text-align: center;
+}
+.banner {
+  position: relative; display: flex; align-items: center; gap: .5rem; max-width: 100%;
+  padding: .3rem .8rem; background: var(--tc); color: #fff;
+  border: var(--line) solid var(--ink); border-radius: .6rem; box-shadow: 0 .3rem 0 var(--ink);
+}
+.banner-name { font-size: 1.6rem; font-weight: bold; line-height: 1.1; }
+.story-art { display: flex; align-items: flex-end; justify-content: center; gap: 1rem; }
+.story-hero { width: min(7rem, 19vh); height: min(7rem, 19vh); }
+.story-villain { width: min(5rem, 14vh); height: min(5rem, 14vh); transform: rotate(-6deg); }
+.story-text { font-size: 1.45rem; line-height: 1.25; max-width: 30rem; }
+.go-btn { min-width: 10rem; font-size: 2rem; }
+
+/* ---------- Mission screen: a flex column; the stage takes the space that is left ---------- */
+.screen.mission { height: 100%; min-height: 0; }
+.mission .bar { gap: .25rem; }
+.mission-title { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.12; }
+.world-name { font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mission-no { font-size: clamp(1rem, 5.3vw, 1.2rem); font-weight: bold; white-space: nowrap; }
+#mission-hero { width: 3rem; height: 3rem; }
+.progress { display: flex; gap: .25rem; padding: .4rem .1rem 0; flex: none; }
+.pbrick {
+  position: relative; flex: 1; height: 1.3rem;
+  border: var(--line) dashed rgba(17,17,17,.45); border-radius: .3rem; background: rgba(255,255,255,.55);
+}
+.pbrick.current { border-style: solid; border-color: var(--ink); background: var(--white); }
+.pbrick.filled { border: var(--line) solid var(--ink); background: linear-gradient(rgba(255,255,255,.38), rgba(255,255,255,0) 50%), var(--bc); }
+.pbrick.filled::before, .pbrick.filled::after {
+  content: ""; position: absolute; bottom: calc(100% + 3px); left: 30%; transform: translateX(-50%);
+  width: .55rem; height: .3rem; background: var(--bc); border: 2px solid var(--ink); border-bottom: 0; border-radius: 2px 2px 0 0;
+}
+.pbrick.filled::after { left: 70%; }
+.pbrick svg { position: absolute; inset: 0; margin: auto; width: 1.15rem; height: 1.15rem; }
+#q-text { flex: none; margin: 0; text-align: center; font-size: 1.8rem; line-height: 1.15; }
+.q-line { display: block; font-size: 1.8rem; }
+.stage {
+  --u: 20px;
+  flex: 1 1 0; min-height: 8rem; position: relative; overflow: hidden;
+  display: flex; align-items: flex-end; justify-content: center; padding: 8px;
+  background: var(--sky); border: var(--line) solid var(--ink); border-radius: .8rem;
+}
+.hint {
+  flex: none; margin: 0; padding: .3rem .6rem; font-size: 1.2rem; line-height: 1.25; text-align: center;
+  background: var(--white); border: var(--line) solid var(--ink); border-radius: .8rem;
+}
+.answers { flex: none; display: flex; gap: .5rem; padding: 0 .5rem .3rem; }
+.choice { flex: 1; min-width: 0; height: 4.6rem; padding: 0; font-size: 3.3rem; line-height: 1; background: var(--yellow); }
+.choice:nth-child(2) { background: #8fd3ff; }
+.choice:nth-child(3) { background: #ffb36b; }
+.choice.used, .tower.used { background: #d4d7db; color: #80858b; border-color: #80858b; box-shadow: 0 .15rem 0 #80858b; }
+.tower.used .stack { filter: grayscale(1); opacity: .5; } /* fade the tower as one piece */
+.choice.right { background: var(--green); color: #fff; }
+.build-controls { display: flex; gap: .5rem; width: 100%; }
+.ctl { flex: 1; min-width: 0; height: 4.6rem; padding: 0 .3rem; display: flex; align-items: center; justify-content: center; gap: .3rem; font-size: 2.4rem; line-height: 1; }
+.ctl svg { width: 2.2rem; height: 2.2rem; }
+.ctl-add { flex: 1.3; background: var(--green); color: #fff; text-shadow: 0 2px 0 rgba(0,0,0,.45); }
+.ctl-undo { background: var(--yellow); }
+.ctl-done { background: var(--blue); color: #fff; font-size: 1.6rem; text-shadow: 0 2px 0 rgba(0,0,0,.45); }
+.ctl-done svg path { stroke: #fff; }
+.ctl:disabled { opacity: .45; box-shadow: 0 .15rem 0 var(--ink); }
+
+/* ---------- Bricks (sizes in --u, colours from --bc) ---------- */
+.c-red { --bc: var(--red); } .c-blue { --bc: var(--blue); } .c-yellow { --bc: var(--yellow); }
+.c-green { --bc: var(--green); } .c-orange { --bc: var(--orange); } .c-black { --bc: var(--black); }
+.c-white { --bc: var(--white); } .c-gold { --bc: var(--gold); } .c-grey { --bc: var(--grey); }
+.brick {
+  position: relative; flex: none;
+  width: var(--bw, calc(var(--u) * 2)); height: calc(var(--u) * 1.2);
+  border: var(--line) solid var(--ink); border-radius: calc(var(--u) * .14);
+  background: linear-gradient(rgba(255,255,255,.38), rgba(255,255,255,0) 50%), var(--bc, var(--red));
+}
+/* Two studs sit on top of every brick; the brick above covers them, so only the top studs show. */
+.brick::before, .brick::after {
+  content: ""; position: absolute; bottom: calc(100% + 3px); left: 27%; transform: translateX(-50%);
+  width: calc(var(--u) * .62); height: calc(var(--u) * .35 + 2px);
+  background: linear-gradient(rgba(255,255,255,.4), rgba(255,255,255,0)), var(--bc, var(--red));
+  border: 2px solid var(--ink); border-bottom: 0; border-radius: 3px 3px 0 0;
+}
+.brick::after { left: 73%; }
+.brick.dashed { background: rgba(255,255,255,.55); border-style: dashed; border-color: rgba(17,17,17,.8); }
+.brick.dashed::before, .brick.dashed::after { display: none; }
+.stack { flex: none; display: flex; flex-direction: column; align-items: stretch; }
+.cols { display: flex; align-items: flex-end; justify-content: center; gap: calc(var(--u) * .5); padding: 0 calc(var(--u) * .25); }
+.col { display: flex; flex-direction: column-reverse; width: var(--bw, calc(var(--u) * 2)); }
+.col > .brick + .brick { margin-bottom: -3px; }
+.plate { height: calc(var(--u) * .5); margin-top: -3px; background: var(--green); border: var(--line) solid var(--ink); border-radius: calc(var(--u) * .12); }
+.scene { flex: none; display: flex; align-items: flex-end; justify-content: center; max-width: 100%; }
+.plus { flex: none; align-self: center; width: calc(var(--u) * 1.5); margin: 0 calc(var(--u) * .6); text-align: center; font-size: calc(var(--u) * 2.5); line-height: 1; font-weight: bold; }
+.scene.towers { align-self: stretch; align-items: stretch; gap: 1.25rem; }
+.tower {
+  --bw: calc(var(--u) * 3);
+  display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
+  min-width: 4.5rem; padding: .5rem; background: rgba(255,255,255,.75); border-radius: .8rem;
+}
+.tower.right { background: #c9f5c4; }
+.knock-scene { align-self: stretch; gap: calc(var(--u) * 1.5); }
+.knock-scene > .stack { align-self: flex-end; }
+.knock-side { align-self: stretch; display: flex; flex-direction: column; justify-content: space-between; align-items: center; width: calc(var(--u) * 6.3); min-width: 3.5rem; }
+.knock-villain { width: 3.5rem; height: 3.5rem; }
+.fallen-pile { display: flex; flex-wrap: wrap-reverse; justify-content: center; gap: calc(var(--u) * .1); width: 100%; }
+.brick.fallen { transform: rotate(-8deg); }
+.brick.fallen:nth-child(2n) { transform: rotate(7deg); }
+.brick.fallen:nth-child(3n) { transform: rotate(-3deg); }
+.groups-scene { gap: calc(var(--u) * 1.25); }
+.share-scene { flex-direction: column; align-items: center; gap: 12px; }
+.wall { display: flex; flex-direction: column-reverse; align-items: center; padding: 0 calc(var(--u) * .25); }
+.wall > .row { display: flex; gap: calc(var(--u) * .15); }
+.wall > .row + .row { margin-bottom: -3px; }
+.team { display: flex; justify-content: center; gap: 8px; }
+.share-face { width: var(--face, 3.5rem); height: var(--face, 3.5rem); }
+
+/* ---------- V2 representations (DESIGN 16.3): number line, symbolic card, word-problem scene ---------- */
+.scene-mid { align-self: center; }
+.nl { display: flex; align-items: center; gap: calc(var(--u) * .2); }
+.nl-end { flex: none; width: var(--u); height: calc(var(--u) * 2); display: flex; align-items: center; }
+.nl-end svg { width: 100%; height: 100%; }
+.nl-main { position: relative; flex: none; width: calc(var(--u) * 24); display: flex; flex-direction: column; gap: calc(var(--u) * .2); }
+.nl-arcs { display: block; width: 100%; height: calc(var(--u) * 2); overflow: visible; }
+.nl-arcs path { fill: none; stroke: var(--red); stroke-width: .14; stroke-linecap: round; animation: hop-in .25s ease-out backwards; }
+.nl-back .nl-arcs path { stroke: var(--blue); }
+.nl-row { display: flex; gap: calc(var(--u) * .2); }
+.nl-tile {
+  flex: none; width: calc(var(--u) * 2); height: calc(var(--u) * 2); display: flex; align-items: center; justify-content: center;
+  font-size: max(16px, calc(var(--u) * 1.05)); font-weight: bold; line-height: 1; letter-spacing: -.04em;
+  background: var(--white); border: 2px solid var(--ink); border-radius: calc(var(--u) * .2);
+}
+.nl-tile.nl-start { background: var(--yellow); }
+.nl-tile.nl-land { background: #c9f5c4; border-style: dashed; }
+.nl-marks { position: relative; height: calc(var(--u) * 2); }
+.nl-face { position: absolute; top: 0; width: calc(var(--u) * 2); height: calc(var(--u) * 2); }
+.sym-card {
+  flex: none; padding: calc(var(--u) * .5) calc(var(--u) * 1.2); white-space: nowrap;
+  font-size: max(28px, calc(var(--u) * 3)); font-weight: bold; line-height: 1.2;
+  background: var(--white); border: var(--line) solid var(--ink); border-radius: calc(var(--u) * .4); box-shadow: 0 .2rem 0 var(--ink);
+}
+.word-scene { align-items: flex-end; gap: var(--u); }
+.ws-face { width: calc(var(--u) * 4); height: calc(var(--u) * 4); }
+.ws-object { display: flex; align-items: flex-end; padding-bottom: calc(var(--u) * .2); }
+
+/* ---------- Next card ---------- */
+.overlay {
+  position: fixed; inset: 0; z-index: 20; display: flex; align-items: flex-end; justify-content: center;
+  padding: 1rem .75rem calc(1.2rem + env(safe-area-inset-bottom, 0px)); background: rgba(0,0,0,.28);
+  animation: fade .2s ease-out;
+}
+.next-box { width: 100%; max-width: 26rem; display: flex; flex-direction: column; align-items: center; gap: .5rem; padding: .9rem 1rem 1.1rem; animation: pop-in .25s ease-out; }
+.praise { font-size: 2rem; font-weight: bold; line-height: 1.15; text-align: center; }
+.got-star { display: flex; align-items: center; gap: .3rem; font-size: 1.5rem; font-weight: bold; }
+.got-star svg { width: 2.4rem; height: 2.4rem; }
+.next-box .big-btn { width: 100%; min-height: 4.6rem; font-size: 2rem; }
+
+/* ---------- World Complete ---------- */
+.complete-screen { align-items: center; justify-content: center; gap: .3rem; text-align: center; overflow: hidden; }
+.complete-screen > :not(.confetti) { position: relative; z-index: 1; }
+.confetti { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+.bit { position: absolute; top: -2rem; width: 1.2rem; height: .75rem; background: var(--bc); border: 2px solid var(--ink); border-radius: 3px; animation: confetti-fall 2s linear forwards; }
+.win-hero { width: min(8rem, 19vh); height: min(8rem, 19vh); animation: bounce .6s ease-out 2; }
+.win-title { font-size: 2.1rem; line-height: 1.1; }
+.win-stars {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: .1rem; padding: .2rem .4rem;
+  background: var(--white); border: var(--line) solid var(--ink); border-radius: 1.2rem;
+}
+/* 9vw cap: all 8 stars stay on one row down to 320 px wide (2.2rem alone wrapped 7 + 1 there). */
+.win-stars .star { display: block; width: min(2.2rem, 9vw); height: min(2.2rem, 9vw); opacity: .3; filter: grayscale(1); }
+.win-stars .star svg { width: 100%; height: 100%; }
+.win-stars .star.on { opacity: 1; filter: none; }
+.win-count { font-size: 1.4rem; font-weight: bold; }
+.new-best { padding: 0 .6rem; font-size: 1.3rem; font-weight: bold; color: #fff; background: var(--red); border: var(--line) solid var(--ink); border-radius: .5rem; transform: rotate(-3deg); }
+.win-line, .master-line, .rest-line { max-width: 30rem; font-size: 1.25rem; line-height: 1.25; }
+.master-line { padding: .2rem .6rem; font-weight: bold; color: #fff; background: var(--black); border: var(--line) solid var(--gold); border-radius: .6rem; }
+.rest-line { padding: .2rem .6rem; background: var(--white); border: var(--line) solid var(--ink); border-radius: .6rem; }
+.win-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem; width: 100%; max-width: 30rem; margin-top: .3rem; }
+/* Two buttons share a row when there is room (>= 2 x 9.5rem), otherwise each gets its own row. */
+.win-buttons .big-btn { flex: 1 1 9.5rem; gap: .3rem; min-height: 3.8rem; padding: .3rem .4rem; font-size: 1.3rem; white-space: nowrap; }
+.win-buttons .big-btn svg { width: 1.6rem; height: 1.6rem; }
+.win-buttons .wide { flex-basis: 100%; }
+
+/* ---------- Animations (all inside clipped boxes, so they never cause scrolling) ---------- */
+@keyframes enter { from { opacity: 0; transform: translateY(.6rem); } }
+@keyframes fade { from { opacity: 0; } }
+@keyframes pop-in { from { opacity: 0; transform: scale(.85); } }
+@keyframes shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(4px); } }
+@keyframes pop { 50% { transform: scale(1.08); } }
+@keyframes drop { from { opacity: 0; transform: translateY(-1.2rem); } }
+@keyframes bounce { 30% { transform: translateY(-.6rem) scale(1.06); } 60% { transform: translateY(0); } 80% { transform: translateY(-.2rem); } }
+@keyframes glow { 50% { box-shadow: 0 .3rem 0 var(--ink), 0 0 0 .3rem rgba(255,255,255,.95); } }
+@keyframes fly { to { opacity: 0; transform: translate(calc(var(--u) * 4), calc(var(--u) * -7)) rotate(50deg); } }
+@keyframes lunge { 40% { transform: translateX(-35%) rotate(-12deg) scale(1.1); } }
+@keyframes confetti-fall { to { transform: translateY(110vh) rotate(540deg); } }
+@keyframes hop-in { from { opacity: 0; } }
+.shake { animation: shake .4s ease-in-out; }
+.pop { animation: pop .3s ease-out; }
+.hint.pop { animation: hint-in .25s ease-out; } /* full-width box: slide in instead of growing past the edges */
+@keyframes hint-in { from { opacity: 0; transform: translateY(.4rem); } }
+.drop { animation: drop .25s ease-out; }
+.bounce { animation: bounce .5s ease-out; }
+.brick.fly { z-index: 2; animation: fly .5s ease-in forwards; }
+.knock-villain.lunge { animation: lunge .45s ease-in-out; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+/* ---------- P5 Ninja Check (DESIGN 16.2, 16.6): Home tile, intro and end cards, the run counter ---------- */
+.tile-white { --tc: var(--white); }
+.check-tile { color: var(--ink); }
+.tile-symbol svg { width: 2rem; height: 2rem; }
+/* An extra tile above the worlds: slightly tighter tiles so all six stay on screen (targets stay >= 56 px). */
+.world-list.has-extra { gap: .6rem; padding-top: .45rem; }
+.world-list.has-extra .world-tile { min-height: 3.7rem; padding-top: .15rem; padding-bottom: .15rem; }
+.check-banner { color: var(--ink); }
+.kind-check .mission-no { white-space: normal; }
+/* Same box and height as the 8-brick bar, so fitStage gives the stage the same room. */
+.run-count {
+  flex: none; display: flex; align-items: flex-end; justify-content: center; box-sizing: content-box;
+  height: 1.3rem; margin: 0; padding: .4rem .1rem 0; font-size: 1.1rem; font-weight: bold; line-height: 1.3rem;
+}
+
+/* ?test speed-up: setSpeed() < 1 makes every animation near-instant. */
+html.nba-fast *, html.nba-fast *::before, html.nba-fast *::after {
+  animation-duration: 1ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; transition: none !important;
+}
+/* Phones held sideways are not a target: ask nicely to turn upright. */
+@media (orientation: landscape) and (max-height: 430px) and (pointer: coarse) {
+  body::after {
+    content: "Turn me upright!"; position: fixed; inset: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; font-weight: bold; background: var(--yellow);
+  }
+}
+
+/* ---------- P6 (DESIGN 16.2): assignment tiles (two or more extra tiles: each still >= 3.5rem = 56 px), Teacher button ---------- */
+.assignment-tile { color: var(--ink); } .player-card .hero-name { overflow-wrap: anywhere; } .kind-assignment .mission-no { white-space: normal; }
+/* A teacher-chosen name can be long: wrap it (at most 2 lines) instead of overflowing the header. */
+.kind-assignment .world-name { white-space: normal; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.1; }
+.world-list.has-extra-2 { gap: .45rem; padding-top: .3rem; } .world-list.has-extra-2 .world-tile { min-height: 3.5rem; }
+.home-foot { display: flex; justify-content: flex-end; padding-top: .6rem; }
+.teacher-btn { width: 56px; height: 56px; min-width: 56px; padding: 10px; border: 2px solid rgba(29, 29, 29, .35); border-radius: .6rem;
+  background: rgba(255, 255, 255, .55); box-shadow: none; opacity: .75; cursor: pointer; touch-action: none; }
+.teacher-btn svg { width: 100%; height: 100%; } .teacher-btn.holding { opacity: 1; outline: 4px solid var(--ink); outline-offset: 2px; }

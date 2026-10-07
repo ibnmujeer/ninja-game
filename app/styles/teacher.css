@@ -1,0 +1,82 @@
+/*
+ * Teacher mode (DESIGN 17.1, D5): scoped under .teacher (#teacher). Denser than the child UI, but every
+ * target is at least 44 x 44 px, text at least 16 px, a 4 px visible focus outline, contrast at least
+ * 4.5:1 (ink #1d1d1d / #0b3d91 on white), levels as text plus a shape. Text can be selected here.
+ */
+.teacher {
+  position: fixed; inset: 0; z-index: 10; overflow-y: auto; overflow-x: hidden;
+  background: #ffffff; color: #1d1d1d;
+  font-family: system-ui, "Segoe UI", Roboto, Arial, sans-serif; font-size: 16px; line-height: 1.45;
+  -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; touch-action: auto;
+}
+.teacher *, .teacher *::before, .teacher *::after { box-sizing: border-box; }
+.teacher h1 { font-size: 1.6rem; margin: .4rem 0 .6rem; line-height: 1.2; }
+.teacher h2 { font-size: 1.3rem; margin: 1.2rem 0 .5rem; line-height: 1.25; }
+.teacher h3 { font-size: 1.1rem; margin: 1rem 0 .4rem; }
+.teacher p, .teacher li, .teacher td, .teacher th, .teacher label, .teacher input, .teacher select, .teacher button, .teacher textarea { font-size: 16px; }
+.teacher :focus-visible { outline: 4px solid #0b3d91; outline-offset: 2px; }
+.teacher [tabindex="-1"]:focus { outline: none; }
+
+.t-shell { max-width: 72rem; margin: 0 auto; padding: .5rem .75rem 2rem; }
+.t-head { display: flex; align-items: center; justify-content: space-between; gap: .75rem; flex-wrap: wrap; }
+.t-brand { font-weight: bold; font-size: 1.2rem; margin: 0; }
+.t-banner { margin: 0 0 .5rem; padding: .6rem .8rem; border: 2px solid #8a4b00; background: #fff4e0; color: #4a2800; border-radius: .4rem; font-weight: bold; }
+.t-nav { display: flex; flex-wrap: wrap; gap: .4rem; margin: .5rem 0 .25rem; border-bottom: 2px solid #1d1d1d; padding-bottom: .5rem; }
+.t-tab {
+  min-height: 44px; min-width: 44px; padding: .5rem .8rem; border: 2px solid #1d1d1d; border-radius: .4rem;
+  background: #ffffff; color: #1d1d1d; cursor: pointer;
+}
+.t-tab[aria-current="page"] { background: #1d1d1d; color: #ffffff; }
+.t-main { padding-top: .25rem; }
+.t-main:focus { outline: none; }
+.t-note { min-height: 1.5rem; margin: .75rem 0 0; }
+
+.t-btn {
+  min-height: 44px; min-width: 44px; padding: .5rem .9rem; border: 2px solid #1d1d1d; border-radius: .4rem;
+  background: #ffffff; color: #1d1d1d; cursor: pointer; font-weight: 600;
+}
+.t-btn:disabled { color: #5a5a5a; border-color: #8a8a8a; background: #f2f2f2; cursor: not-allowed; }
+.t-primary { background: #0b3d91; border-color: #0b3d91; color: #ffffff; }
+.t-danger { background: #a50e0e; border-color: #a50e0e; color: #ffffff; }
+.t-primary:disabled, .t-danger:disabled { background: #f2f2f2; border-color: #8a8a8a; color: #5a5a5a; }
+.t-link { min-height: 44px; padding: .4rem .2rem; border: 0; background: none; color: #0b3d91; text-decoration: underline; cursor: pointer; text-align: left; }
+.t-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .75rem; }
+.t-row-actions { display: flex; flex-wrap: wrap; gap: .35rem; }
+
+.t-card { border: 2px solid #1d1d1d; border-radius: .5rem; padding: .75rem 1rem; background: #ffffff; margin: .5rem 0; }
+.t-field { display: flex; flex-direction: column; gap: .25rem; margin: .6rem 0; }
+.t-inline { flex-direction: row; align-items: center; flex-wrap: wrap; gap: .5rem; }
+.t-field input[type="text"], .t-field input[type="date"], .t-field input[type="number"], .t-field select, .t-field textarea {
+  min-height: 44px; padding: .4rem .6rem; border: 2px solid #1d1d1d; border-radius: .35rem; background: #ffffff; color: #1d1d1d; max-width: 28rem; width: 100%;
+}
+.t-inline select { width: auto; max-width: 100%; }
+.t-field input[type="file"] { min-height: 44px; font-size: 1rem; max-width: 28rem; }
+.t-check { display: flex; align-items: center; gap: .5rem; min-height: 44px; }
+.t-check input { width: 24px; height: 24px; margin: 0; }
+.t-fieldset { border: 2px solid #1d1d1d; border-radius: .4rem; margin: .6rem 0; padding: .4rem .8rem .6rem; }
+.t-fieldset legend { font-weight: bold; padding: 0 .3rem; }
+.t-help { color: #3a3a3a; margin: .25rem 0; }
+.t-error { color: #a50e0e; font-weight: bold; margin: .25rem 0; }
+.t-error:empty { display: none; }
+[aria-invalid="true"] { border-color: #a50e0e !important; }
+
+.t-table { border-collapse: collapse; width: 100%; margin: .5rem 0 1rem; }
+.t-table th, .t-table td { border: 1px solid #6a6a6a; padding: .4rem .5rem; text-align: left; vertical-align: top; }
+.t-table th { background: #eef1f6; }
+.t-scroll { overflow-x: auto; }
+.t-muted { color: #3a3a3a; }
+.t-tag { display: inline-block; border: 1px solid #1d1d1d; border-radius: .3rem; padding: 0 .35rem; margin-left: .35rem; font-size: 16px; }
+.t-level { white-space: nowrap; font-weight: 600; }
+.t-shape { display: inline-block; width: 1.2em; text-align: center; font-size: 1.1em; }
+.t-list { margin: .25rem 0 .75rem; padding-left: 1.4rem; }
+
+.t-gate { min-height: 100%; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+.t-gate .t-card { max-width: 30rem; width: 100%; }
+.t-overlay { position: fixed; inset: 0; z-index: 20; background: rgba(0, 0, 0, .45); display: flex; align-items: center; justify-content: center; padding: 1rem; overflow-y: auto; }
+.t-dialog { max-width: 34rem; width: 100%; max-height: 100%; overflow-y: auto; }
+
+@media print {
+  .teacher { position: static; overflow: visible; }
+  .t-nav, .t-head, .t-actions, .t-row-actions, .t-banner, .t-no-print, #app { display: none !important; }
+  html, body { overflow: visible !important; height: auto !important; background: #ffffff !important; }
+}
